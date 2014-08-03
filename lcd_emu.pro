@@ -34,8 +34,8 @@ HEADERS  += mainwindow.h \
     siGui/guiHAL/guiLcdHAL.h \
     siGui/guiGraph/guiFonts.h \
     siGui/guiGraph/guiImages.h \
-    siGui/guiCore/guiEvents.h \
-    siGui/guiWidgets/guiWidgets.h
+    siGui/guiWidgets/guiWidgets.h \
+    siGui/guiCore/guiMsg.h
 
 INCLUDEPATH += "./siGUI"
 INCLUDEPATH += "./siGUI/guiCore"

@@ -13,27 +13,43 @@ void guiCore_Init()
 
 void prv_graphPrimitivesTest()
 {
-
-
     guiGraph_SetPenColor(CL_WHITE);
-    guiGraph_SetAltPenColor(CL_RED);
-    guiGraph_SetFillColor(CL_GREEN);
-    guiGraph_SetLineStyle(line_style_solid);
+    guiGraph_SetAltPenColor(CL_GREEN);
+    guiGraph_SetFillColor(CL_BLUE);
 
-    guiGraph_SetFont(&font_h10_bold);
-    guiGraph_PrintString("Hello font", 34, 12);
+    guiWidgetText_t lbl;
 
-    guiGraph_DrawPackedImage(checkbox_10x10_checked, 40, 40, 10, 10);
-    guiGraph_DrawPackedImage(checkbox_10x10_empty, 40, 60, 10, 10);
+    guiWidgetBase_t *pWgt = (guiWidgetBase_t*)&lbl;
 
-    guiGraph_DrawPackedImage(checkbox_10x10_checked_no_frame, 40, 80, 10, 10);
-    guiGraph_DrawPackedImage(checkbox_10x10_empty_no_frame, 40, 100, 10, 10);
+    pWgt->x = 32;
+    pWgt->y = 12;
+    pWgt->width = 50;
+    pWgt->height = 40;
 
-    guiGraph_DrawPackedImage(checkbox_8x8_checked_no_frame, 60, 40, 8, 8);
-    guiGraph_DrawPackedImage(checkbox_8x8_empty_no_frame, 60, 60, 8, 8);
+    guiCore_DrawWidget(pWgt);
 
-    guiGraph_DrawPackedImage(checkbox_9x9_checked_no_frame, 60, 80, 9, 9);
-    guiGraph_DrawPackedImage(checkbox_9x9_empty_no_frame, 60, 100, 9, 9);
+    lbl.font = &font_h12;
+    lbl.hasFrame = 0;
+    lbl.redrawText = 0;
+    lbl.text = "This is lbl.";
+    lbl.textAlignment = ALIGN_CENTER;
+
+    guiCore_DrawWidgetText(&lbl);
+}
 
 
+void guiCore_DrawWidget(guiWidgetBase_t *widget)
+{
+    rect_t rect;
+    rect.x1 = widget->x;
+    rect.y1 = widget->y;
+    rect.x2 = widget->x + widget->width;
+    rect.y2 = widget->y + widget->height;
+    guiGraph_DrawFillRect(&rect);
+}
+
+void guiCore_DrawWidgetText(guiWidgetText_t *widget)
+{
+    guiGraph_SetFont(widget->font);
+    guiGraph_PrintString(widget->text,widget->widget.x, widget->widget.y);
 }

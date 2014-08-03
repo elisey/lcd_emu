@@ -1,17 +1,20 @@
 #ifndef GUI_WIDGETS_H_
 #define GUI_WIDGETS_H_
 
-#include "guiEvents.h"
+#include "guiMsg.h"
+#include "guiGraphPrimitives.h"
+//extern typedef struct guiObject_t;
 
-typedef uint8_t (*eventHandler_t)(void *sender, guiEvent_t *event);
+typedef uint8_t (*eventHandler_t)(void *sender, guiMsg_t *msg);
 
 // Event handler record
 typedef struct {
     uint8_t eventType;                                         // Event type
-    uint8_t (*handler)(void *sender, guiEvent_t *event);       // Related callback function pointer
+    uint8_t (*handler)(void *sender, guiMsg_t *msg);       // Related callback function pointer
 } guiWidgetHandler_t;
 
 // Event handlers table
+#ifdef GG
 typedef struct {
     uint8_t count;                      // Count of handler records
     guiWidgetHandler_t *elements;       // Pointer to array of handler records
@@ -24,14 +27,15 @@ typedef struct {
     uint8_t traverseIndex;              // Required by core for tree traverse
     void **elements;
 } guiWidgetCollection_t;
+#endif
 
-typedef struct  {
-    guiObject_t *parent;
-    uint8_t (*processEvent)(struct guiObject_t *pObject, guiEvent_t event);
-    guiHandlerTable_t handlers;
-} guiObject_t;
+typedef struct guiObject_t {
+    struct guiObject_t *parent;
+    uint8_t (*processEvent)(struct guiObject_t *pObject, guiMsg_t *msg);
+    //guiHandlerTable_t handlers;
+} guiObject_t ;
 
-typedef struct   {
+typedef struct guiWidgetBase_t  {
     guiObject_t object;
     uint8_t type;                           //FIXME special type implement
     uint8_t isContainer         :   1;
@@ -47,14 +51,23 @@ typedef struct   {
     uint16_t width;
     uint16_t height;
 
-} guiWidget_t;
+} guiWidgetBase_t;
 
 
-typedef struct  {
-    guiWidget_t widget;
+typedef struct guiContainer_t {
+    guiWidgetBase_t widget;
 
-    guiWidgetCollection_t widgets;
-} guiContainer_t
+    //guiWidgetCollection_t widgets;
+} guiContainer_t;
+
+typedef struct guiWidgetText_t   {
+    guiWidgetBase_t widget;
+    char *text;
+    const tFont *font;
+    uint8_t textAlignment;
+    uint8_t hasFrame : 1;
+    uint8_t redrawText : 1;
+} guiWidgetText_t;
 
 
 #endif
