@@ -1,38 +1,18 @@
 #ifndef GUI_WIDGETS_H_
 #define GUI_WIDGETS_H_
 
-#include "guiMsg.h"
+#include "guiEvent.h"
 #include "guiGraphPrimitives.h"
-//extern typedef struct guiObject_t;
 
-typedef uint8_t (*eventHandler_t)(void *sender, guiMsg_t *msg);
 
-// Event handler record
-typedef struct {
-    uint8_t eventType;                                         // Event type
-    uint8_t (*handler)(void *sender, guiMsg_t *msg);       // Related callback function pointer
-} guiWidgetHandler_t;
 
-// Event handlers table
-#ifdef GG
-typedef struct {
-    uint8_t count;                      // Count of handler records
-    guiWidgetHandler_t *elements;       // Pointer to array of handler records
-} guiHandlerTable_t;
+typedef uint8_t (*eventHandler_t)(void *sender, guiEvent_t *msg);
 
-// Widget collection type - used by containers
-typedef struct {
-    uint8_t count;
-    uint8_t focusedIndex;
-    uint8_t traverseIndex;              // Required by core for tree traverse
-    void **elements;
-} guiWidgetCollection_t;
-#endif
+
 
 typedef struct guiObject_t {
     struct guiObject_t *parent;
-    uint8_t (*processEvent)(struct guiObject_t *pObject, guiMsg_t *msg);
-    //guiHandlerTable_t handlers;
+    uint8_t (*processEvent)(struct guiObject_t *pObject, guiEvent_t event);
 } guiObject_t ;
 
 typedef struct guiWidgetBase_t  {
@@ -60,14 +40,7 @@ typedef struct guiContainer_t {
     //guiWidgetCollection_t widgets;
 } guiContainer_t;
 
-typedef struct guiWidgetText_t   {
-    guiWidgetBase_t widget;
-    char *text;
-    const tFont *font;
-    uint8_t textAlignment;
-    uint8_t hasFrame : 1;
-    uint8_t redrawText : 1;
-} guiWidgetText_t;
+
 
 
 #endif

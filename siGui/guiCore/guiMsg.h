@@ -2,12 +2,18 @@
 #define GUI_EVENTS_H_
 
 #include <stdint.h>
+#include "guiWidgets.h"
 
-typedef struct {
-    uint8_t type;
-    uint8_t spec;
-    uint16_t lparam;
-    uint16_t hparam;
-} guiMsg_t;
+#define GUI_EVENT_DECLINE       0x00
+#define GUI_EVENT_ACCEPTED      0x01
+
+
+
+
+
+void guiMsg_InitQueue ();
+uint8_t guiMsg_AddMessageToQueue(guiObject_t *target, const guiEvent_t *event);
+uint8_t guiMsg_GetMessageFromQueue(guiObject_t **target, guiEvent_t *event);
+void guiMsg_ProcessMessageQueue(void);
 
 #endif
