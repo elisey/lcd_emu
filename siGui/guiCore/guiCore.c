@@ -9,6 +9,7 @@
 
 
 guiWidgetBase_t *rootWidget;
+guiWidgetBase_t *focusedWidget;
 
 void prv_graphPrimitivesTest();
 uint8_t lbl_OnDraw(void *sender, guiEvent_t *event);
@@ -17,6 +18,12 @@ uint8_t lbl_OnDraw(void *sender, guiEvent_t *event);
 void guiCore_Init(guiWidgetBase_t* root)
 {
     rootWidget = root;
+    focusedWidget = 0;
+
+    guiMsg_InitQueue();
+    guiGraph_SetPenColor(CL_WHITE);
+    guiGraph_SetAltPenColor(CL_GREEN);
+    guiGraph_SetFillColor(CL_BLUE);
     prv_graphPrimitivesTest();
 
 }
@@ -24,11 +31,7 @@ void guiCore_Init(guiWidgetBase_t* root)
 
 void prv_graphPrimitivesTest()
 {
-    guiMsg_InitQueue();
 
-    guiGraph_SetPenColor(CL_WHITE);
-    guiGraph_SetAltPenColor(CL_GREEN);
-    guiGraph_SetFillColor(CL_BLUE);
 
     guiWidgetPanel_t panel;
     guiWidgetPanel_Init(&panel, 0);
@@ -49,11 +52,9 @@ void prv_graphPrimitivesTest()
     lbl2.font = &font_h10;
     lbl2.text = "THis is second lbl.";
     guiWidgets_SetSize((guiWidgetBase_t*)&lbl2, 15,70, 45,45);
+
     guiCore_AllocateHandlers((guiWidgetBase_t*)&lbl2, 1);
     guiCore_AddHandler((guiWidgetBase_t*)&lbl2, GUI_EVENT_DRAW, lbl_OnDraw);
-
-    guiCore_AddWidgetToCollection((guiWidgetBase_t*)&lbl, (guiContainer_t*)&panel );
-    guiCore_AddWidgetToCollection((guiWidgetBase_t*)&lbl2, (guiContainer_t*)&panel );
 
     guiMsg_AddMessageToQueue((guiWidgetBase_t*)(&panel), &guiEvent_DRAW);
     guiMsg_AddMessageToQueue((guiWidgetBase_t*)(&lbl), &guiEvent_DRAW);

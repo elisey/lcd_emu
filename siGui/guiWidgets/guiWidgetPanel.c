@@ -10,15 +10,10 @@ void guiWidgetPanel_Draw(guiWidgetPanel_t *wgt);
 void guiWidgetPanel_Init(guiWidgetPanel_t *wgt, guiWidgetBase_t *parent)
 {
     guiWidgetBase_t *pBaseWgt = (guiWidgetBase_t*)wgt;
-    pBaseWgt->handlers.count = 0;
+    guiWidgets_InitWidget(pBaseWgt, parent);
+
     pBaseWgt->isContainer = 1;
-    pBaseWgt->isFocused = 0;
-    pBaseWgt->isVisible = 1;
-    pBaseWgt->parent = parent;
     pBaseWgt->processEvent = guiWidgetPanel_ProcessEvent;
-    pBaseWgt->requireDraw = 1;
-    pBaseWgt->requireDrawFocus = 0;
-    pBaseWgt->requireUpdate = 0;
     pBaseWgt->type = 2; //FIXME
 
     guiContainer_t *pContainer = (guiContainer_t*)wgt;

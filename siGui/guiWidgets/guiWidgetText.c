@@ -11,15 +11,10 @@ void guiWidgetText_Draw(guiWidgetText_t *wgt);
 void guiWidgetText_Init(guiWidgetText_t *wgt, guiWidgetBase_t *parent)
 {
     guiWidgetBase_t *pBaseWgt = (guiWidgetBase_t*)wgt;
-    pBaseWgt->handlers.count = 0;
+    guiWidgets_InitWidget(pBaseWgt, parent);
+
     pBaseWgt->isContainer = 0;
-    pBaseWgt->isFocused = 0;
-    pBaseWgt->isVisible = 1;
-    pBaseWgt->parent = parent;
     pBaseWgt->processEvent = guiWidgetText_ProcessEvent;
-    pBaseWgt->requireDraw = 1;
-    pBaseWgt->requireDrawFocus = 0;
-    pBaseWgt->requireUpdate = 0;
     pBaseWgt->type = 1; //FIXME
 
     wgt->font = &guiWGT_TEXT_DefaultFont;
@@ -27,16 +22,49 @@ void guiWidgetText_Init(guiWidgetText_t *wgt, guiWidgetBase_t *parent)
     wgt->redrawText = 0;
 }
 
+void guiWidgetText_SetText(guiWidgetText_t *wgt, const char *text)
+{
+    wgt->text = text;
+    wgt->widget.requireDraw = 1;
+}
+
+#define GUI_EVENT_DRAW          0x01
+#define GUI_EVENT_INIT          0x02
+#define GUI_EVENT_UPDATE        0x04
+#define GUI_EVENT_HIDE          0x06
+#define GUI_EVENT_SHOW          0x07
+#define GUI_EVENT_UNFOCUS       0x08
+#define GUI_EVENT_FOCUS         0x09
+
 uint8_t guiWidgetText_ProcessEvent(guiWidgetBase_t *wgt, guiEvent_t *event)
 {
     switch (event->type) {
     case GUI_EVENT_DRAW:
         guiWidgetText_Draw( (guiWidgetText_t*)wgt );
         break;
+    case GUI_EVENT_INIT:
+
+        break;
+    case GUI_EVENT_UPDATE:
+
+        break;
+    case GUI_EVENT_HIDE:
+
+        break;
+    case GUI_EVENT_SHOW:
+
+        break;
+    case GUI_EVENT_UNFOCUS:
+
+        break;
+    case GUI_EVENT_FOCUS:
+
+        break;
     default:
+        return guiCore_CallEventHandler(wgt, event);
         break;
     }
-    guiCore_CallEventHandler(wgt, event);
+
     return GUI_EVENT_ACCEPTED;
 }
 
@@ -45,3 +73,6 @@ void guiWidgetText_Draw(guiWidgetText_t *wgt)
     guiGraph_SetFont(wgt->font);
     guiGraph_PrintString(wgt->text, wgt->widget.x, wgt->widget.y);
 }
+
+
+

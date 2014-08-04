@@ -3,7 +3,6 @@
 
 #include "guiEvent.h"
 #include "guiGraphPrimitives.h"
-
 typedef uint8_t (*eventHandler_t)(void *sender, guiEvent_t *event);
 
 // Event handler record
@@ -39,6 +38,10 @@ typedef struct guiWidgetBase_t  {
     uint8_t requireDraw         :   1;
     uint8_t requireDrawFocus    :   1;
 
+    uint8_t acceptFocusByTab    :   1;
+    uint8_t tabIndex;
+
+
     int16_t x;
     int16_t y;
     uint16_t width;
@@ -54,5 +57,7 @@ typedef struct guiContainer_t {
 
 
 void guiWidgets_SetSize(guiWidgetBase_t *pBaseWgt,int16_t x, int16_t y, uint16_t width, uint16_t height);
-
+void guiWidgets_InitWidget(guiWidgetBase_t *pBaseWgt, guiWidgetBase_t* parent);
+void guiWidgets_SetVisible(guiWidgetBase_t *pBaseWgt, int isVisible);
+void guiWidgets_SetFocused(guiWidgetBase_t *pBaseWgt, int isFocused);
 #endif

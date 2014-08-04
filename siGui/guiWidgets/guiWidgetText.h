@@ -19,5 +19,5 @@ typedef struct guiWidgetText_t   {
 } guiWidgetText_t;
 
 void guiWidgetText_Init(guiWidgetText_t *wgt, guiWidgetBase_t *parent);
-
+void guiWidgetText_SetText(guiWidgetText_t *wgt, const char* text);
 #endif

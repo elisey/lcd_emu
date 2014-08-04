@@ -2,16 +2,13 @@
 
 #include "guiConfig.h"
 
-// Predefined constant events - saves stack a bit
-const guiEvent_t guiEvent_INIT = {GUI_EVENT_INIT, 0, 0, 0};
-const guiEvent_t guiEvent_DRAW = {GUI_EVENT_DRAW, 0, 0, 0};
-#ifdef CFG_USE_UPDATE
-const guiEvent_t guiEvent_UPDATE = {GUI_EVENT_UPDATE, 0, 0, 0};
-#endif
-const guiEvent_t guiEvent_HIDE = {GUI_EVENT_HIDE, 0, 0, 0};
-const guiEvent_t guiEvent_SHOW = {GUI_EVENT_SHOW, 0, 0, 0};
-const guiEvent_t guiEvent_UNFOCUS = {GUI_EVENT_UNFOCUS, 0, 0, 0};
-const guiEvent_t guiEvent_FOCUS = {GUI_EVENT_FOCUS, 0, 0, 0};
+const guiEvent_t guiEvent_INIT      = {GUI_EVENT_INIT, 0, 0, 0};
+const guiEvent_t guiEvent_DRAW      = {GUI_EVENT_DRAW, 0, 0, 0};
+const guiEvent_t guiEvent_UPDATE    = {GUI_EVENT_UPDATE, 0, 0, 0};
+const guiEvent_t guiEvent_FOCUS     = {GUI_EVENT_FOCUS, 0, 0, 0};
+const guiEvent_t guiEvent_UNFOCUS   = {GUI_EVENT_UNFOCUS, 0, 0, 0};
+const guiEvent_t guiEvent_SHOW      = {GUI_EVENT_SHOW, 0, 0, 0};
+const guiEvent_t guiEvent_HIDE      = {GUI_EVENT_HIDE, 0, 0, 0};
 
 typedef struct {
     guiWidgetBase_t *target;
