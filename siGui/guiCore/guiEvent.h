@@ -11,7 +11,6 @@
 #define GUI_EVENT_FOCUS         0x09
 #define GUI_EVENT_TOUCH         0x0A
 #define GUI_EVENT_KEY           0x0B
-//#define GUI_EVENT_ENCODER       0x0C
 #define GUI_EVENT_TIMER         0x0D
 
 // Event types for callbacks (common widget event handlers)

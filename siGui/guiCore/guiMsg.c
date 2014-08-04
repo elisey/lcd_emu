@@ -14,7 +14,7 @@ const guiEvent_t guiEvent_UNFOCUS = {GUI_EVENT_UNFOCUS, 0, 0, 0};
 const guiEvent_t guiEvent_FOCUS = {GUI_EVENT_FOCUS, 0, 0, 0};
 
 typedef struct {
-    guiObject_t *target;
+    guiWidgetBase_t *target;
     guiEvent_t event;
 } guiMsg_t;
 
@@ -35,12 +35,12 @@ void guiMsg_InitQueue ()
 }
 
 
-uint8_t guiMsg_AddMessageToQueue(guiObject_t *target, const guiEvent_t *event)
+uint8_t guiMsg_AddMessageToQueue(guiWidgetBase_t *target, const guiEvent_t *event)
 {
     if (guiMsgQueue.count < emGUI_CORE_QUEUE_SIZE)
     {
         guiMsgQueue.queue[guiMsgQueue.tail].event = *event;
-        guiMsgQueue.queue[guiMsgQueue.tail].target = (guiObject_t *)target;
+        guiMsgQueue.queue[guiMsgQueue.tail].target = (guiWidgetBase_t *)target;
         guiMsgQueue.count++;
         guiMsgQueue.tail++;
         if (guiMsgQueue.tail == emGUI_CORE_QUEUE_SIZE)
@@ -51,7 +51,7 @@ uint8_t guiMsg_AddMessageToQueue(guiObject_t *target, const guiEvent_t *event)
 }
 
 
-uint8_t guiMsg_GetMessageFromQueue(guiObject_t **target, guiEvent_t *event)
+uint8_t guiMsg_GetMessageFromQueue(guiWidgetBase_t **target, guiEvent_t *event)
 {
     if (guiMsgQueue.count > 0)
     {
@@ -69,7 +69,7 @@ uint8_t guiMsg_GetMessageFromQueue(guiObject_t **target, guiEvent_t *event)
 
 void guiMsg_ProcessMessageQueue()
 {
-    guiObject_t *target;
+    guiWidgetBase_t *target;
     guiEvent_t targetEvent;
     uint8_t processResult;
 
@@ -79,7 +79,7 @@ void guiMsg_ProcessMessageQueue()
         {
             if (target == 0)
                 break;
-            processResult = target->processEvent(target, targetEvent);
+            processResult = target->processEvent(target, &targetEvent);
             if (processResult == GUI_EVENT_ACCEPTED)
                 break;
             // Focused widget cannot process event - pass event to parent

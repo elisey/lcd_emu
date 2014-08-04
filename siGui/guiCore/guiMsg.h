@@ -8,12 +8,9 @@
 #define GUI_EVENT_ACCEPTED      0x01
 
 
-
-
-
 void guiMsg_InitQueue ();
-uint8_t guiMsg_AddMessageToQueue(guiObject_t *target, const guiEvent_t *event);
-uint8_t guiMsg_GetMessageFromQueue(guiObject_t **target, guiEvent_t *event);
+uint8_t guiMsg_AddMessageToQueue(guiWidgetBase_t *target, const guiEvent_t *event);
+uint8_t guiMsg_GetMessageFromQueue(guiWidgetBase_t **target, guiEvent_t *event);
 void guiMsg_ProcessMessageQueue(void);
 
 #endif

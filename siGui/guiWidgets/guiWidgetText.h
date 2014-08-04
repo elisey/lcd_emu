@@ -3,6 +3,12 @@
 
 #include "guiWidgets.h"
 
+#define guiWGT_TEXT_DefaultFont         font_h10
+#define guiWGT_TEXT_DefaultHasFrame     0
+#define guiWGT_TEXT_Default
+#define guiWGT_TEXT_Default
+#define guiWGT_TEXT_Default
+
 typedef struct guiWidgetText_t   {
     guiWidgetBase_t widget;
     char *text;
@@ -12,7 +18,6 @@ typedef struct guiWidgetText_t   {
     uint8_t redrawText : 1;
 } guiWidgetText_t;
 
-void guiWidgetText_Init(guiWidgetText_t *wgt, guiObject_t *parent);
-
+void guiWidgetText_Init(guiWidgetText_t *wgt, guiWidgetBase_t *parent);
 
 #endif

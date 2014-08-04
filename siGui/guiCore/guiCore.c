@@ -1,13 +1,22 @@
 #include "guiCore.h"
 //#include "guiLcdHAL.h"
 #include "guiWidgetText.h"
+#include "guiWidgetPanel.h"
+
 #include "guiMsg.h"
+#include "guiConfig.h"
+#include <string.h>
+
+
+guiWidgetBase_t *rootWidget;
 
 void prv_graphPrimitivesTest();
-uint8_t lbl_processEvent(guiObject_t *pObject, guiEvent_t event);
+uint8_t lbl_OnDraw(void *sender, guiEvent_t *event);
+//uint8_t lbl_processEvent(guiObject_t *pObject, guiEvent_t event);
 
-void guiCore_Init()
+void guiCore_Init(guiWidgetBase_t* root)
 {
+    rootWidget = root;
     prv_graphPrimitivesTest();
 
 }
@@ -21,26 +30,213 @@ void prv_graphPrimitivesTest()
     guiGraph_SetAltPenColor(CL_GREEN);
     guiGraph_SetFillColor(CL_BLUE);
 
+    guiWidgetPanel_t panel;
+    guiWidgetPanel_Init(&panel, 0);
+    guiCore_AllocateWidgetCollection((guiContainer_t*)&panel, 3);
+
     guiWidgetText_t lbl;
-    guiWidgetText_Init(&lbl, 0);
-    guiWidgetBase_t *pWgt = (guiWidgetBase_t*)&lbl;
-
-    pWgt->x = 32;
-    pWgt->y = 12;
-    pWgt->width = 50;
-    pWgt->height = 40;
-
+    guiWidgetText_Init(&lbl, (guiWidgetBase_t*)&panel);
     lbl.font = &font_h12;
     lbl.hasFrame = 0;
     lbl.redrawText = 0;
     lbl.text = "This is lbl.";
     lbl.textAlignment = ALIGN_CENTER;
+    guiWidgets_SetSize((guiWidgetBase_t*)&lbl, 15,15, 45,45);
 
-   // guiEvent_t event;
-   // event.type = guiEvent_DRAW;
 
-    guiMsg_AddMessageToQueue((guiObject_t*)(&lbl), &guiEvent_DRAW);
+    guiWidgetText_t lbl2;
+    guiWidgetText_Init(&lbl2, (guiWidgetBase_t*)&panel);
+    lbl2.font = &font_h10;
+    lbl2.text = "THis is second lbl.";
+    guiWidgets_SetSize((guiWidgetBase_t*)&lbl2, 15,70, 45,45);
+    guiCore_AllocateHandlers((guiWidgetBase_t*)&lbl2, 1);
+    guiCore_AddHandler((guiWidgetBase_t*)&lbl2, GUI_EVENT_DRAW, lbl_OnDraw);
+
+    guiCore_AddWidgetToCollection((guiWidgetBase_t*)&lbl, (guiContainer_t*)&panel );
+    guiCore_AddWidgetToCollection((guiWidgetBase_t*)&lbl2, (guiContainer_t*)&panel );
+
+    guiMsg_AddMessageToQueue((guiWidgetBase_t*)(&panel), &guiEvent_DRAW);
+    guiMsg_AddMessageToQueue((guiWidgetBase_t*)(&lbl), &guiEvent_DRAW);
+    guiMsg_AddMessageToQueue((guiWidgetBase_t*)(&lbl2), &guiEvent_DRAW);
     guiMsg_ProcessMessageQueue();
 
 
+}
+
+
+uint8_t lbl_OnDraw(void *sender, guiEvent_t *event)
+{
+    guiWidgetText_t *pTxt = (guiWidgetText_t*)sender;
+
+    pTxt->text = "fjkldsfjkl";
+    //guiMsg_AddMessageToQueue((guiObject_t*)(&lbl2), &guiEvent_DRAW);
+    return 1;
+}
+
+
+// REAL CODE===================================================================================
+
+#define emGUI_BYTE_ALIGNMENT_MASK ( emGUI_BYTE_ALIGNMENT - 1 )
+// A few bytes might be lost to byte aligning the heap start address
+#define emGUI_ADJUSTED_HEAP_SIZE	( emGUI_HEAP_SIZE - emGUI_BYTE_ALIGNMENT )
+
+static unsigned char gui_heap[emGUI_HEAP_SIZE];
+static size_t allocated_bytes_count = (size_t) 0;
+
+
+void *guiCore_malloc(size_t wantedSize)
+{
+    static unsigned char *p_heap = 0;
+    void *result = 0;
+
+    // Make sure blocks are aligned
+    #if emGUI_BYTE_ALIGNMENT != 1
+        if (wantedSize & emGUI_BYTE_ALIGNMENT_MASK)
+        {
+            // Adjust allocated block size
+            wantedSize += (emGUI_BYTE_ALIGNMENT - (wantedSize & emGUI_BYTE_ALIGNMENT_MASK));
+        }
+    #endif
+
+    if (p_heap == 0)
+    {
+        p_heap = (unsigned char *)(((emGUI_POINTER_SIZE_TYPE)&gui_heap[emGUI_BYTE_ALIGNMENT_MASK]) & ((emGUI_POINTER_SIZE_TYPE) ~emGUI_BYTE_ALIGNMENT_MASK));
+    }
+
+    // Check if there is enough space
+    if( ( ( allocated_bytes_count + wantedSize ) < emGUI_ADJUSTED_HEAP_SIZE ) &&
+        ( ( allocated_bytes_count + wantedSize ) > allocated_bytes_count )	)   // Check for overflow
+    {
+        // Return the next free byte then increment the index past this block
+        result = p_heap + allocated_bytes_count;
+        allocated_bytes_count += wantedSize;
+    }
+
+    if (result == 0)
+    {
+        // Trace error
+        //guiCore_Error(emGUI_ERROR_OUT_OF_HEAP); //FIXME
+    }
+    return result;
+}
+
+
+void *guiCore_calloc(size_t wantedSize)
+{
+    void *result = guiCore_malloc(wantedSize);
+    if (result)
+    {
+        memset(result, 0, wantedSize);
+    }
+    return result;
+}
+
+
+size_t guiCore_GetFreeHeapSize( void )
+{
+    return ( emGUI_ADJUSTED_HEAP_SIZE - allocated_bytes_count );
+}
+
+
+void guiCore_AllocateHandlers(guiWidgetBase_t *obj, uint16_t count)
+{
+    if (obj != 0)
+    {
+        obj->handlers.count = count;
+        obj->handlers.elements = guiCore_calloc(count * sizeof(guiWidgetHandler_t));
+    }
+    else
+    {
+        //guiCore_Error(emGUI_ERROR_NULL_REF); //FEXME add error handler
+    }
+}
+
+uint8_t guiCore_AddHandler(guiWidgetBase_t *obj, uint8_t eventType, eventHandler_t handler)
+{
+    uint8_t i;
+    //guiGenericWidget_t *w = (guiGenericWidget_t *)widget;
+    if ((obj == 0) || (handler == 0))
+        return 0;
+    for (i = 0; i < obj->handlers.count; i++)
+    {
+        if (obj->handlers.elements[i].handler == 0)
+        {
+            // Found free item slot
+            obj->handlers.elements[i].eventType = eventType;
+            obj->handlers.elements[i].handler = handler;
+            return 1;
+        }
+    }
+    // No free space
+    //guiCore_Error(emGUI_ERROR_OUT_OF_PREALLOCATED_MEMORY);//FEXME add error handler
+    return 0;
+}
+
+//-------------------------------------------------------//
+//  Call widget's handler for an event
+//
+//  Function searches through the widget's handler table
+//  and call handlers for matching event type
+//-------------------------------------------------------//
+uint8_t guiCore_CallEventHandler(guiWidgetBase_t *obj, guiEvent_t *event)
+{
+    uint8_t i;
+    uint8_t handlerResult = GUI_EVENT_DECLINE;
+    for(i=0; i<obj->handlers.count; i++)
+    {
+        if (obj->handlers.elements[i].eventType == event->type)
+        {
+            handlerResult = obj->handlers.elements[i].handler(obj, event);
+        }
+    }
+    return handlerResult;
+}
+
+void guiCore_RedrawAll()
+{
+
+}
+
+//-------------------------------------------------------//
+// Adds a widget to collection
+// The widget being added gets specified container widget as parent
+// Not used items in a collection must be zero
+// If success, function returns non-zero
+//-------------------------------------------------------//
+uint8_t guiCore_AddWidgetToCollection(guiWidgetBase_t *widget, guiContainer_t *container)
+{
+    uint8_t i;
+    if ((widget != 0) && (container != 0))
+    {
+        for (i = 0; i < container->children.count; i++)
+        {
+            if (container->children.elements[i] == 0)
+            {
+                // Found free item slot
+                container->children.elements[i] = widget;
+                widget->parent = (guiWidgetBase_t *)container;
+                return 1;
+            }
+        }
+    }
+    else
+    {
+        //guiCore_Error(emGUI_ERROR_NULL_REF); FIXME
+        return 0;
+    }
+    //guiCore_Error(emGUI_ERROR_OUT_OF_PREALLOCATED_MEMORY);  FIXME
+    return 0;
+}
+
+void guiCore_AllocateWidgetCollection(guiContainer_t *container, uint16_t count)
+{
+    if (container != 0)
+    {
+        container->children.count = count;
+        container->children.elements = guiCore_calloc(count * sizeof(void *));
+    }
+    else
+    {
+        //guiCore_Error(emGUI_ERROR_NULL_REF); FIXME
+    }
 }
