@@ -44,6 +44,7 @@ void prv_graphPrimitivesTest()
     lbl.redrawText = 0;
     lbl.text = "This is lbl.";
     lbl.textAlignment = ALIGN_CENTER;
+    lbl.widget.acceptFocusByTab = 1;
     guiWidgets_SetSize((guiWidgetBase_t*)&lbl, 15,15, 45,45);
 
 
@@ -51,6 +52,7 @@ void prv_graphPrimitivesTest()
     guiWidgetText_Init(&lbl2, (guiWidgetBase_t*)&panel);
     lbl2.font = &font_h10;
     lbl2.text = "THis is second lbl.";
+    lbl2.widget.acceptFocusByTab = 1;
     guiWidgets_SetSize((guiWidgetBase_t*)&lbl2, 15,70, 45,45);
 
     guiCore_AllocateHandlers((guiWidgetBase_t*)&lbl2, 1);
@@ -59,6 +61,11 @@ void prv_graphPrimitivesTest()
     guiMsg_AddMessageToQueue((guiWidgetBase_t*)(&panel), &guiEvent_DRAW);
     guiMsg_AddMessageToQueue((guiWidgetBase_t*)(&lbl), &guiEvent_DRAW);
     guiMsg_AddMessageToQueue((guiWidgetBase_t*)(&lbl2), &guiEvent_DRAW);
+
+    guiCore_FocusWidget((guiWidgetBase_t*)&lbl2);
+
+    //guiCore_FocusNext();
+    //guiCore_FocusNext();
     guiMsg_ProcessMessageQueue();
 
 
@@ -235,9 +242,67 @@ void guiCore_AllocateWidgetCollection(guiContainer_t *container, uint16_t count)
     {
         container->children.count = count;
         container->children.elements = guiCore_calloc(count * sizeof(void *));
+        int i;
+        for (i = 0; i < count; ++i) {
+            container->children.elements[i] = 0;
+        }
     }
     else
     {
         //guiCore_Error(emGUI_ERROR_NULL_REF); FIXME
     }
 }
+
+int guiCore_FocusWidget(guiWidgetBase_t *wgt)
+{
+    //FIXME проверка указателя на нуль
+    if (wgt->parent->isContainer == 1)  {
+        guiContainer_t *collection;
+        int i;
+        collection = (guiContainer_t*)wgt->parent;
+
+        for (i = 0; i < collection->children.count; ++i) {
+            if (collection->children.elements[i] == wgt) {
+                collection->children.focusedIndex = i;
+                break;
+            }
+        }
+    }
+    if (focusedWidget != 0) {
+        guiMsg_AddMessageToQueue(focusedWidget, &guiEvent_UNFOCUS);
+    }
+
+    guiMsg_AddMessageToQueue(wgt, &guiEvent_FOCUS);
+    focusedWidget = wgt;
+    return 1;
+}
+
+int guiCore_FocusNext()
+{
+    int i;
+    guiContainer_t *collection;
+    collection = (guiContainer_t*)focusedWidget->parent;
+    //FIXME проверка указателя на нуль
+    for (i = (collection->children.focusedIndex + 1); i < collection->children.count; ++i) {
+        guiWidgetBase_t *baseWgt;
+        baseWgt = collection->children.elements[i];
+        if (baseWgt == 0) continue;
+        if (baseWgt->acceptFocusByTab == 1) {
+            guiMsg_AddMessageToQueue(focusedWidget, &guiEvent_UNFOCUS);
+            guiMsg_AddMessageToQueue(baseWgt, &guiEvent_FOCUS);
+            focusedWidget = baseWgt;
+            collection->children.focusedIndex = i;
+            return 1;
+        }
+    }
+    return 0;
+}
+
+
+int guiCore_FocusPrev()
+{
+    return 1;
+}
+
+
+

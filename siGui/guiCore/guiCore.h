@@ -21,4 +21,8 @@ void guiCore_RedrawAll();
 uint8_t guiCore_AddWidgetToCollection(guiWidgetBase_t *widget, guiContainer_t *container);
 void guiCore_AllocateWidgetCollection(guiContainer_t *container, uint16_t count);
 
+int guiCore_FocusWidget(guiWidgetBase_t* wgt);
+int guiCore_FocusNext();
+int guiCore_FocusPrev();
+
 #endif // GUICORE_H

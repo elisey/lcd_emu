@@ -38,6 +38,8 @@ void guiWidgetText_SetText(guiWidgetText_t *wgt, const char *text)
 
 uint8_t guiWidgetText_ProcessEvent(guiWidgetBase_t *wgt, guiEvent_t *event)
 {
+    rect_t rect;
+
     switch (event->type) {
     case GUI_EVENT_DRAW:
         guiWidgetText_Draw( (guiWidgetText_t*)wgt );
@@ -55,10 +57,20 @@ uint8_t guiWidgetText_ProcessEvent(guiWidgetBase_t *wgt, guiEvent_t *event)
 
         break;
     case GUI_EVENT_UNFOCUS:
-
+        rect.x1 = wgt->x;
+        rect.x2 = wgt->x + wgt->width;
+        rect.y1 = wgt->y;
+        rect.y2 = wgt->y + wgt->height;
+        guiGraph_SetPenColor(CL_LIGHT_GREY);
+        guiGraph_DrawRect(&rect);
         break;
     case GUI_EVENT_FOCUS:
-
+        rect.x1 = wgt->x;
+        rect.x2 = wgt->x + wgt->width;
+        rect.y1 = wgt->y;
+        rect.y2 = wgt->y + wgt->height;
+        guiGraph_SetPenColor(CL_BLUE);
+        guiGraph_DrawRect(&rect);
         break;
     default:
         return guiCore_CallEventHandler(wgt, event);
