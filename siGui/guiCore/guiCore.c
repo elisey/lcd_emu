@@ -10,6 +10,7 @@
 
 guiWidgetBase_t *rootWidget;
 guiWidgetBase_t *focusedWidget;
+guiContainer_t *activeWindow;           //Текущее активное окно. Тип Контейнер.
 
 void prv_graphPrimitivesTest();
 uint8_t lbl_OnDraw(void *sender, guiEvent_t *event);
@@ -62,10 +63,10 @@ void prv_graphPrimitivesTest()
     guiMsg_AddMessageToQueue((guiWidgetBase_t*)(&lbl), &guiEvent_DRAW);
     guiMsg_AddMessageToQueue((guiWidgetBase_t*)(&lbl2), &guiEvent_DRAW);
 
-    guiCore_FocusWidget((guiWidgetBase_t*)&lbl2);
+    guiCore_FocusChange((guiWidgetBase_t*)&panel);
 
-    //guiCore_FocusNext();
-    //guiCore_FocusNext();
+    guiCore_FocusNext();
+    guiCore_FocusNext();
     guiMsg_ProcessMessageQueue();
 
 
@@ -123,7 +124,7 @@ void *guiCore_malloc(size_t wantedSize)
     if (result == 0)
     {
         // Trace error
-        //guiCore_Error(emGUI_ERROR_OUT_OF_HEAP); //FIXME
+        guiCore_Error(emGUI_ERROR_OUT_OF_HEAP);
     }
     return result;
 }
@@ -155,7 +156,7 @@ void guiCore_AllocateHandlers(guiWidgetBase_t *obj, uint16_t count)
     }
     else
     {
-        //guiCore_Error(emGUI_ERROR_NULL_REF); //FEXME add error handler
+        guiCore_Error(emGUI_ERROR_NULL_REF);
     }
 }
 
@@ -229,10 +230,10 @@ uint8_t guiCore_AddWidgetToCollection(guiWidgetBase_t *widget, guiContainer_t *c
     }
     else
     {
-        //guiCore_Error(emGUI_ERROR_NULL_REF); FIXME
+        guiCore_Error(emGUI_ERROR_NULL_REF);
         return 0;
     }
-    //guiCore_Error(emGUI_ERROR_OUT_OF_PREALLOCATED_MEMORY);  FIXME
+    guiCore_Error(emGUI_ERROR_OUT_OF_PREALLOCATED_MEMORY);
     return 0;
 }
 
@@ -249,32 +250,40 @@ void guiCore_AllocateWidgetCollection(guiContainer_t *container, uint16_t count)
     }
     else
     {
-        //guiCore_Error(emGUI_ERROR_NULL_REF); FIXME
+        guiCore_Error(emGUI_ERROR_NULL_REF);
     }
 }
 
-int guiCore_FocusWidget(guiWidgetBase_t *wgt)
+/*int guiCore_FocusChange(guiWidgetBase_t *wgt)
 {
-    //FIXME проверка указателя на нуль
-    if (wgt->parent->isContainer == 1)  {
-        guiContainer_t *collection;
-        int i;
-        collection = (guiContainer_t*)wgt->parent;
+    if (wgt != 0)   {
+        if (wgt->parent != 0)   {
+            if (wgt->parent->isContainer == 1)  {
+                guiContainer_t *collection;
+                int i;
+                collection = (guiContainer_t*)wgt->parent;
 
-        for (i = 0; i < collection->children.count; ++i) {
-            if (collection->children.elements[i] == wgt) {
-                collection->children.focusedIndex = i;
-                break;
+                for (i = 0; i < collection->children.count; ++i) {
+                    if (collection->children.elements[i] == wgt) {
+                        collection->children.focusedIndex = i;
+                        break;
+                    }
+                }
             }
         }
-    }
-    if (focusedWidget != 0) {
-        guiMsg_AddMessageToQueue(focusedWidget, &guiEvent_UNFOCUS);
-    }
 
-    guiMsg_AddMessageToQueue(wgt, &guiEvent_FOCUS);
-    focusedWidget = wgt;
-    return 1;
+        if (focusedWidget != 0) {
+            guiMsg_AddMessageToQueue(focusedWidget, &guiEvent_UNFOCUS);
+        }
+
+        guiMsg_AddMessageToQueue(wgt, &guiEvent_FOCUS);
+        focusedWidget = wgt;
+        return 1;
+    }
+    else    {
+        guiCore_Error(emGUI_ERROR_NULL_REF);
+        return 0;
+    }
 }
 
 int guiCore_FocusNext()
@@ -282,7 +291,9 @@ int guiCore_FocusNext()
     int i;
     guiContainer_t *collection;
     collection = (guiContainer_t*)focusedWidget->parent;
-    //FIXME проверка указателя на нуль
+    if (collection == 0)    {
+        guiCore_Error(emGUI_ERROR_NULL_REF);
+    }
     for (i = (collection->children.focusedIndex + 1); i < collection->children.count; ++i) {
         guiWidgetBase_t *baseWgt;
         baseWgt = collection->children.elements[i];
@@ -304,5 +315,59 @@ int guiCore_FocusPrev()
     return 1;
 }
 
+int guiCore_FocusPushToChild(guiContainer_t *container)
+{
+    int i;
+    if (container == 0) {
+        guiCore_Error(emGUI_ERROR_NULL_REF);
+    }
+
+    for (i = 0; i < container->children.count; ++i) {
+        guiWidgetBase_t *baseWgt;
+        baseWgt = container->children.elements[i];
+        if (baseWgt == 0) continue;
+        if (baseWgt->acceptFocusByTab == 1) {
+            guiMsg_AddMessageToQueue(focusedWidget, &guiEvent_UNFOCUS);
+            guiMsg_AddMessageToQueue(baseWgt, &guiEvent_FOCUS);
+            focusedWidget = baseWgt;
+            container->children.focusedIndex = i;
+            return 1;
+        }
+    }
+    return 0;
+
+}*/
+
+void guiCore_Error(uint8_t errCode)
+{
+    // One may trace call stack and thus find source of the error
+    while(1);
+}
 
 
+
+
+
+
+int guiCore_SetActiveWindow(guiContainer_t *activeWnd)
+{
+
+}
+
+
+int guiCore_GetActiveWindow(guiContainer_t **ptrActiveWnd)
+{
+
+}
+
+
+int guiCore_FocusNext(int direction)
+{
+
+}
+
+
+int guiCore_FocusChange(guiWidgetBase_t *wgt)
+{
+
+}

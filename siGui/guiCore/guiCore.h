@@ -3,6 +3,10 @@
 
 #include "guiWidgets.h"
 
+#define emGUI_ERROR_OUT_OF_HEAP                 0x01
+#define emGUI_ERROR_OUT_OF_PREALLOCATED_MEMORY  0x02
+#define emGUI_ERROR_NULL_REF                    0x03
+
 void guiCore_Init();
 //void guiCore_DrawWidget(guiWidgetBase_t *widget);
 //void guiCore_DrawWidgetText(guiWidgetText_t *widget);
@@ -21,8 +25,16 @@ void guiCore_RedrawAll();
 uint8_t guiCore_AddWidgetToCollection(guiWidgetBase_t *widget, guiContainer_t *container);
 void guiCore_AllocateWidgetCollection(guiContainer_t *container, uint16_t count);
 
-int guiCore_FocusWidget(guiWidgetBase_t* wgt);
+int guiCore_FocusChange(guiWidgetBase_t* wgt);
 int guiCore_FocusNext();
 int guiCore_FocusPrev();
+int guiCore_FocusPushToChild(guiContainer_t *container);
+
+int guiCore_SetActiveWindow(guiContainer_t* activeWnd);
+int guiCore_GetActiveWindow(guiContainer_t** ptrActiveWnd);
+int guiCore_FocusNext(int direction);
+int guiCore_FocusChange(guiWidgetBase_t* wgt);
+
+void guiCore_Error(uint8_t errCode);
 
 #endif // GUICORE_H

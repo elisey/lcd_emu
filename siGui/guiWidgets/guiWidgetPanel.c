@@ -31,6 +31,12 @@ uint8_t guiWidgetPanel_ProcessEvent(guiWidgetBase_t *wgt, guiEvent_t *event)
     case GUI_EVENT_DRAW:
         guiWidgetPanel_Draw( (guiWidgetPanel_t*)wgt );
         break;
+    case GUI_EVENT_UNFOCUS:
+
+        break;
+    case GUI_EVENT_FOCUS:
+        guiCore_FocusPushToChild((guiContainer_t*)wgt);
+        break;
     default:
         break;
     }
