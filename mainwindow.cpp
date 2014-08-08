@@ -8,7 +8,9 @@
 
 extern "C"  {
 #include "guiCore.h"
+#include "guiMsg.h"
 #include "guiLcdHAL.h"
+#include "guiButtonHAL.h"
 }
 
 //extern color_t guiLcdBuffer[];
@@ -47,7 +49,7 @@ MainWindow::MainWindow(QWidget *parent)
     pCentralWidget->setLayout(pvbxLayout);
 
     pTimer = new QTimer;
-    pTimer->setInterval(100);
+	pTimer->setInterval(1);
     pTimer->setSingleShot(false);
     emit pTimer->start();
     QObject::connect( pTimer, SIGNAL(timeout()), this, SLOT(slotTimerTimeout()) );
@@ -62,24 +64,29 @@ MainWindow::~MainWindow()
 void MainWindow::slotOnEnterBtn()
 {
     lbl->setText("Enter Button");
+	Buttons_onKeyPressed(KEY_ENTER);
 }
 
 void MainWindow::slotOnEscBtn()
 {
     lbl->setText("Esc Button");
+	Buttons_onKeyPressed(KEY_ESC);
 }
 
 void MainWindow::slotOnLeftBtn()
 {
     lbl->setText("Left Button");
+	Buttons_onKeyPressed(KEY_LEFT);
 }
 
 void MainWindow::slotOnRightBtn()
 {
     lbl->setText("Right Button");
+	Buttons_onKeyPressed(KEY_RIGHT);
 }
 
 void MainWindow::slotTimerTimeout()
 {
     px->updateDisplay(guiLcdBuffer);
+	 guiMsg_ProcessMessageQueue();
 }

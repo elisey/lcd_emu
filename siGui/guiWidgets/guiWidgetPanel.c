@@ -18,7 +18,7 @@ void guiWidgetPanel_Init(guiWidgetPanel_t *wgt, guiWidgetBase_t *parent)
 
     guiContainer_t *pContainer = (guiContainer_t*)wgt;
     pContainer->children.count = 0;
-    pContainer->children.focusedIndex = 0;
+	pContainer->children.focusedIndex = -1;
     pContainer->children.traverseIndex = 0;
 
     wgt->hasFrame = 0;

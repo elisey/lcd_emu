@@ -30,7 +30,7 @@ int guiCore_FocusNext();
 int guiCore_FocusPrev();
 int guiCore_FocusPushToChild(guiContainer_t *container);*/
 
-int guiCore_SetActiveWindow(guiContainer_t* activeWnd);
+int guiCore_SetActiveWindow(guiContainer_t* _activeWnd);
 int guiCore_GetActiveWindow(guiContainer_t** ptrActiveWnd);
 int guiCore_FocusFirst();
 int guiCore_FocusNext(int direction);

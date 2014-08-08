@@ -20,7 +20,7 @@ typedef struct {
 // Widget collection type - used by containers
 typedef struct {
     uint8_t count;
-    uint8_t focusedIndex;
+	int8_t focusedIndex;
     uint8_t traverseIndex;              // Required by core for tree traverse
     void **elements;
 } guiWidgetCollection_t;

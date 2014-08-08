@@ -27,7 +27,8 @@ SOURCES += main.cpp\
     siGui/guiCore/guiMsg.c \
     siGui/guiWidgets/guiWidgetText.c \
     siGui/guiWidgets/guiWidgetPanel.c \
-    siGui/guiWidgets/guiWidgets.c
+    siGui/guiWidgets/guiWidgets.c \
+    siGui/guiHAL/guiButtonHAL.c
 
 
 HEADERS  += mainwindow.h \
@@ -42,7 +43,8 @@ HEADERS  += mainwindow.h \
     siGui/guiCore/guiMsg.h \
     siGui/guiCore/guiEvent.h \
     siGui/guiWidgets/guiWidgetText.h \
-    siGui/guiWidgets/guiWidgetPanel.h
+    siGui/guiWidgets/guiWidgetPanel.h \
+    siGui/guiHAL/guiButtonHAL.h
 
 INCLUDEPATH += "./siGUI"
 INCLUDEPATH += "./siGUI/guiCore"
