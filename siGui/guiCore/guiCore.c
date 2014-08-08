@@ -270,115 +270,47 @@ void guiCore_AllocateWidgetCollection(guiContainer_t *container, uint16_t count)
     }
 }
 
-/*int guiCore_FocusChange(guiWidgetBase_t *wgt)
-{
-    if (wgt != 0)   {
-        if (wgt->parent != 0)   {
-            if (wgt->parent->isContainer == 1)  {
-                guiContainer_t *collection;
-                int i;
-                collection = (guiContainer_t*)wgt->parent;
-
-                for (i = 0; i < collection->children.count; ++i) {
-                    if (collection->children.elements[i] == wgt) {
-                        collection->children.focusedIndex = i;
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (focusedWidget != 0) {
-            guiMsg_AddMessageToQueue(focusedWidget, &guiEvent_UNFOCUS);
-        }
-
-        guiMsg_AddMessageToQueue(wgt, &guiEvent_FOCUS);
-        focusedWidget = wgt;
-        return 1;
-    }
-    else    {
-        guiCore_Error(emGUI_ERROR_NULL_REF);
-        return 0;
-    }
-}
-
-int guiCore_FocusNext()
-{
-    int i;
-    guiContainer_t *collection;
-    collection = (guiContainer_t*)focusedWidget->parent;
-    if (collection == 0)    {
-        guiCore_Error(emGUI_ERROR_NULL_REF);
-    }
-    for (i = (collection->children.focusedIndex + 1); i < collection->children.count; ++i) {
-        guiWidgetBase_t *baseWgt;
-        baseWgt = collection->children.elements[i];
-        if (baseWgt == 0) continue;
-        if (baseWgt->acceptFocusByTab == 1) {
-            guiMsg_AddMessageToQueue(focusedWidget, &guiEvent_UNFOCUS);
-            guiMsg_AddMessageToQueue(baseWgt, &guiEvent_FOCUS);
-            focusedWidget = baseWgt;
-            collection->children.focusedIndex = i;
-            return 1;
-        }
-    }
-    return 0;
-}
-
-
-int guiCore_FocusPrev()
-{
-    return 1;
-}
-
-int guiCore_FocusPushToChild(guiContainer_t *container)
-{
-    int i;
-    if (container == 0) {
-        guiCore_Error(emGUI_ERROR_NULL_REF);
-    }
-
-    for (i = 0; i < container->children.count; ++i) {
-        guiWidgetBase_t *baseWgt;
-        baseWgt = container->children.elements[i];
-        if (baseWgt == 0) continue;
-        if (baseWgt->acceptFocusByTab == 1) {
-            guiMsg_AddMessageToQueue(focusedWidget, &guiEvent_UNFOCUS);
-            guiMsg_AddMessageToQueue(baseWgt, &guiEvent_FOCUS);
-            focusedWidget = baseWgt;
-            container->children.focusedIndex = i;
-            return 1;
-        }
-    }
-    return 0;
-
-}*/
-
 void guiCore_Error(uint8_t errCode)
 {
     // One may trace call stack and thus find source of the error
     while(1);
 }
 
-
-
-
-
-
-int guiCore_SetActiveWindow(guiContainer_t *_activeWnd)
-{
-	activeWindow = _activeWnd;
-	guiCore_FocusFirst();
-}
-
-
-int guiCore_GetActiveWindow(guiContainer_t **ptrActiveWnd)
-{
-
-}
-
-/*  return -1 - нет допустимого элемента для фокусировки
+/*
+ * Установка активного окна. В качестве окна может выступать
+ * любой контейнер.
+ * @param:
+ * guiContainer_t *_activeWindow указатель на новое активное окно
  *
+ * @return
+ * int - (-1) не удалось выставить фокус на дочерние элементы
+ * int - 0 фокус выставлен на первый доступный дочерний элемент.
+ */
+int guiCore_SetActiveWindow(guiContainer_t *_activeWindow)
+{
+	activeWindow = _activeWindow;
+	return guiCore_FocusFirst();
+}
+
+/*
+ * Получить указатель на текущее активное окно.
+ * @param
+ * guiContainer_t **ptrActiveWnd указатель на указатель на текущее
+ * активнео окн
+ * @return void
+ */
+void guiCore_GetActiveWindow(guiContainer_t **ptrActiveWnd)
+{
+	*ptrActiveWnd = activeWindow;
+}
+
+/*
+ * Сфокусироваться на первом доступном элементе в текущем окне (контейнере)
+ * @param
+ * none
+ * @return
+ * (-1) - нет допустимого элемента для фокусировки
+ * idx - индекс элемента, на котором произведено фокусирование
  */
 int guiCore_FocusFirst()
 {
@@ -391,11 +323,16 @@ int guiCore_FocusFirst()
 	}
 	activeWindow->children.focusedIndex = idx;
 	guiCore_AcceptFocus(activeWindow->children.elements[idx]);
-	return 0;
+	return idx;
 }
 
-/*  return -1 - нет допустимого следующего элемента для фокусировки
- *
+/*
+ * Сфокусироваться на следующем доступном элементе в текущем окне (контейнере)
+ * @param
+ * int direction - направление сдвига фокуса: >0 - вперед, <0 - назад
+ * @return
+ * (-1) - нет допустимого элемента для фокусировки
+ * idx - индекс элемента, на котором произведено фокусирование
  */
 int guiCore_FocusNext(int direction)
 {
@@ -408,6 +345,14 @@ int guiCore_FocusNext(int direction)
 	return 0;
 }
 
+/*
+ * Взять индекс следующего доступного элемента для фокусировки
+ * @param
+ * int direction - направление сдвига фокуса: >0 - вперед, <0 - назад
+ * @return
+ * (-1) - нет допустимого элемента для фокусировки
+ * idx - индекс элемента, на котором произведено фокусирование
+ */
 int guiCore_GetNextFocusableWgtIdx(int direction)
 {
 	guiWidgetBase_t* wgt;
@@ -426,29 +371,14 @@ int guiCore_GetNextFocusableWgtIdx(int direction)
 	}while(1);
 }
 
-
-
-
-
-
-/*int guiCore_FocusChange(guiWidgetBase_t *wgt)
-{
-	if (wgt == 0)   {
-		guiCore_Error(emGUI_ERROR_NULL_REF);
-		return 0;
-	}
-
-	int result = guiCore_GetWgtContainerIndex(wgt);
-	if (result != -1)   {
-		guiContainer_t *container = (guiContainer_t*)wgt->parent;
-		container->children.focusedIndex = result;
-		activeWindow = container;
-	}
-
-	guiCore_AcceptFocus(wgt);
-
-}*/
-
+/*
+ * Принять изменение фокуса. Происходит отправка сообщения снятия
+ * и установки фокуса. Изменять сфокусированность ТОЛЬКО через эту функцию
+ * @param
+ * guiWidgetBase_t *wgt - указатель виджет для фокусировки.
+ * @return
+ * void
+ */
 void guiCore_AcceptFocus(guiWidgetBase_t *wgt)
 {
 	if (wgt == 0)   {
@@ -461,26 +391,3 @@ void guiCore_AcceptFocus(guiWidgetBase_t *wgt)
 	guiMsg_AddMessageToQueue(wgt, &guiEvent_FOCUS);
 	focusedWidget = wgt;
 }
-
-
-/*int guiCore_GetWgtContainerIndex(guiWidgetBase_t *wgt)
-{
-	if (wgt == 0)   {
-		guiCore_Error(emGUI_ERROR_NULL_REF);
-		return -1;
-	}
-	if (wgt->parent == 0)   {
-		//guiCore_Error(emGUI_ERROR_NULL_REF);
-		return -1;
-	}
-
-	int i;
-	guiContainer_t* container = (guiContainer_t*)wgt->parent;
-
-	for (i = 0; i < container->children.count; ++i) {
-		if (container->children.elements[i] == wgt) {
-			return i;
-		}
-	}
-	return -1;
-}*/
