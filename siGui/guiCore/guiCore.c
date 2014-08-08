@@ -63,10 +63,10 @@ void prv_graphPrimitivesTest()
     guiMsg_AddMessageToQueue((guiWidgetBase_t*)(&lbl), &guiEvent_DRAW);
     guiMsg_AddMessageToQueue((guiWidgetBase_t*)(&lbl2), &guiEvent_DRAW);
 
-    guiCore_FocusChange((guiWidgetBase_t*)&panel);
+    //guiCore_FocusChange((guiWidgetBase_t*)&panel);
 
-    guiCore_FocusNext();
-    guiCore_FocusNext();
+    //guiCore_FocusNext();
+    //guiCore_FocusNext();
     guiMsg_ProcessMessageQueue();
 
 
@@ -360,14 +360,109 @@ int guiCore_GetActiveWindow(guiContainer_t **ptrActiveWnd)
 
 }
 
+/*  return -1 - нет допустимого элемента для фокусировки
+ *
+ */
+int guiCore_FocusFirst()
+{
+    int idx;
 
+    activeWindow->children.focusedIndex = -1;
+    idx = guiCore_GetNextFocusableWgtIdx(1);
+    if (idx == (-1) )    {
+        return (-1);
+    }
+    activeWindow->children.focusedIndex = idx;
+    guiCore_AcceptFocus(activeWindow->children.elements[idx]);
+    return 0;
+}
+
+/*  return -1 - нет допустимого следующего элемента для фокусировки
+ *
+ */
 int guiCore_FocusNext(int direction)
 {
-
+    int idx = guiCore_GetNextFocusableWgtIdx(direction);
+    if (idx == -1)  {
+        return (-1);
+    }
+    activeWindow->children.focusedIndex = idx;
+    guiCore_AcceptFocus(activeWindow->children.elements[idx]);
+    return 0;
 }
 
-
-int guiCore_FocusChange(guiWidgetBase_t *wgt)
+int guiCore_GetNextFocusableWgtIdx(int direction)
 {
+    guiWidgetBase_t* wgt;
+    int idx = activeWindow->children.focusedIndex;
+    do  {
+        idx = (direction > 0 ? idx+1: idx - 1);
+        if ( ( idx < 0 ) || (idx > activeWindow->children.count) )    {
+             return (-1);
+        }
 
+        wgt = activeWindow->children.elements[idx];
+        if (wgt->acceptFocusByTab == 1) {
+            return idx;
+        }
+    }while(1);
 }
+
+
+
+
+
+
+/*int guiCore_FocusChange(guiWidgetBase_t *wgt)
+{
+    if (wgt == 0)   {
+        guiCore_Error(emGUI_ERROR_NULL_REF);
+        return 0;
+    }
+
+    int result = guiCore_GetWgtContainerIndex(wgt);
+    if (result != -1)   {
+        guiContainer_t *container = (guiContainer_t*)wgt->parent;
+        container->children.focusedIndex = result;
+        activeWindow = container;
+    }
+
+    guiCore_AcceptFocus(wgt);
+
+}*/
+
+void guiCore_AcceptFocus(guiWidgetBase_t *wgt)
+{
+    if (wgt == 0)   {
+        guiCore_Error(emGUI_ERROR_NULL_REF);
+        return;
+    }
+    if (focusedWidget != 0) {
+        guiMsg_AddMessageToQueue(focusedWidget, &guiEvent_UNFOCUS);
+    }
+    guiMsg_AddMessageToQueue(wgt, &guiEvent_FOCUS);
+    focusedWidget = wgt;
+}
+
+
+/*int guiCore_GetWgtContainerIndex(guiWidgetBase_t *wgt)
+{
+    if (wgt == 0)   {
+        guiCore_Error(emGUI_ERROR_NULL_REF);
+        return -1;
+    }
+    if (wgt->parent == 0)   {
+        //guiCore_Error(emGUI_ERROR_NULL_REF);
+        return -1;
+    }
+
+    int i;
+    guiContainer_t* container = (guiContainer_t*)wgt->parent;
+
+    for (i = 0; i < container->children.count; ++i) {
+        if (container->children.elements[i] == wgt) {
+            return i;
+        }
+    }
+    return -1;
+}*/

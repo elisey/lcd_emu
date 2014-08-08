@@ -28,6 +28,9 @@ void guiWidgetPanel_Init(guiWidgetPanel_t *wgt, guiWidgetBase_t *parent)
 uint8_t guiWidgetPanel_ProcessEvent(guiWidgetBase_t *wgt, guiEvent_t *event)
 {
     switch (event->type) {
+    case GUI_EVENT_INIT:
+
+        break;
     case GUI_EVENT_DRAW:
         guiWidgetPanel_Draw( (guiWidgetPanel_t*)wgt );
         break;
@@ -35,7 +38,7 @@ uint8_t guiWidgetPanel_ProcessEvent(guiWidgetBase_t *wgt, guiEvent_t *event)
 
         break;
     case GUI_EVENT_FOCUS:
-        guiCore_FocusPushToChild((guiContainer_t*)wgt);
+        //guiCore_FocusPushToChild((guiContainer_t*)wgt);
         break;
     default:
         break;

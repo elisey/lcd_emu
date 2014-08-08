@@ -25,15 +25,19 @@ void guiCore_RedrawAll();
 uint8_t guiCore_AddWidgetToCollection(guiWidgetBase_t *widget, guiContainer_t *container);
 void guiCore_AllocateWidgetCollection(guiContainer_t *container, uint16_t count);
 
-int guiCore_FocusChange(guiWidgetBase_t* wgt);
+/*int guiCore_FocusChange(guiWidgetBase_t* wgt);
 int guiCore_FocusNext();
 int guiCore_FocusPrev();
-int guiCore_FocusPushToChild(guiContainer_t *container);
+int guiCore_FocusPushToChild(guiContainer_t *container);*/
 
 int guiCore_SetActiveWindow(guiContainer_t* activeWnd);
 int guiCore_GetActiveWindow(guiContainer_t** ptrActiveWnd);
+int guiCore_FocusFirst();
 int guiCore_FocusNext(int direction);
-int guiCore_FocusChange(guiWidgetBase_t* wgt);
+
+//int guiCore_FocusChange(guiWidgetBase_t* wgt);
+void guiCore_AcceptFocus(guiWidgetBase_t *wgt);
+//int guiCore_GetWgtContainerIndex(guiWidgetBase_t *wgt);
 
 void guiCore_Error(uint8_t errCode);
 
