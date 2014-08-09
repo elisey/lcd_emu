@@ -5,10 +5,10 @@ void Buttons_onKeyPressed(int key)
 {
 	switch (key) {
 	case KEY_ENTER:
-		//guiCore_FocusNext(1);
+		guiCore_SetActiveWindow((guiContainer_t*)&panel2);
 		break;
 	case KEY_ESC:
-		guiCore_FocusFirst();
+		guiCore_SetActiveWindow((guiContainer_t*)&panel);
 		break;
 	case KEY_LEFT:
 		guiCore_FocusNext(-1);

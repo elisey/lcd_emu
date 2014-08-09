@@ -13,8 +13,6 @@ guiWidgetBase_t *focusedWidget;
 guiContainer_t *activeWindow;           //Текущее активное окно. Тип Контейнер.
 
 void prv_graphPrimitivesTest();
-uint8_t lbl_OnDraw(void *sender, guiEvent_t *event);
-//uint8_t lbl_processEvent(guiObject_t *pObject, guiEvent_t event);
 
 void guiCore_Init(guiWidgetBase_t* root)
 {
@@ -30,11 +28,17 @@ void guiCore_Init(guiWidgetBase_t* root)
 }
 
 
+void prv_wnd1Init();
 guiWidgetPanel_t panel;
 guiWidgetText_t lbl;
 guiWidgetText_t lbl2;
 guiWidgetText_t lbl3;
 
+void prv_wnd2Init();
+guiWidgetPanel_t panel2;
+guiWidgetText_t lbl4;
+guiWidgetText_t lbl5;
+guiWidgetText_t lbl6;
 
 void prv_graphPrimitivesTest()
 {
@@ -67,36 +71,75 @@ void prv_graphPrimitivesTest()
     guiWidgets_SetSize((guiWidgetBase_t*)&lbl2, 15,70, 45,45);
 
 
-
-    guiCore_AllocateHandlers((guiWidgetBase_t*)&lbl2, 1);
-    guiCore_AddHandler((guiWidgetBase_t*)&lbl2, GUI_EVENT_DRAW, lbl_OnDraw);
-
     guiMsg_AddMessageToQueue((guiWidgetBase_t*)(&panel), &guiEvent_DRAW);
     guiMsg_AddMessageToQueue((guiWidgetBase_t*)(&lbl), &guiEvent_DRAW);
     guiMsg_AddMessageToQueue((guiWidgetBase_t*)(&lbl2), &guiEvent_DRAW);
 	guiMsg_AddMessageToQueue((guiWidgetBase_t*)(&lbl3), &guiEvent_DRAW);
 
+	prv_wnd1Init();
+	prv_wnd2Init();
 
 	guiCore_SetActiveWindow((guiContainer_t*)&panel);
-	//guiCore_FocusNext(1);
-	//guiCore_FocusNext(1);
-	//guiCore_FocusNext(-1);
-
-
 	guiMsg_ProcessMessageQueue();
-
-
 }
 
-
-uint8_t lbl_OnDraw(void *sender, guiEvent_t *event)
+void prv_wnd1Init()
 {
-    guiWidgetText_t *pTxt = (guiWidgetText_t*)sender;
+	guiWidgetPanel_Init(&panel, 0);
+	guiCore_AllocateWidgetCollection((guiContainer_t*)&panel, 3);
 
-    pTxt->text = "fjkldsfjkl";
-    //guiMsg_AddMessageToQueue((guiObject_t*)(&lbl2), &guiEvent_DRAW);
-    return 1;
+
+	guiWidgetText_Init(&lbl, (guiWidgetBase_t*)&panel);
+	lbl.font = &font_h12;
+	lbl.hasFrame = 0;
+	lbl.redrawText = 0;
+	lbl.text = "This is lbl.";
+	lbl.textAlignment = ALIGN_CENTER;
+	lbl.widget.acceptFocusByTab = 1;
+	guiWidgets_SetSize((guiWidgetBase_t*)&lbl, 15,15, 45,45);
+
+	guiWidgetText_Init(&lbl3, (guiWidgetBase_t*)&panel);
+	lbl3.font = &font_h12;
+	lbl3.text = "This is another text lable. So";
+	lbl3.widget.acceptFocusByTab = 1;
+	guiWidgets_SetSize((guiWidgetBase_t*)&lbl3, 15,70, 45,45);
+
+	guiWidgetText_Init(&lbl2, (guiWidgetBase_t*)&panel);
+	lbl2.font = &font_h10;
+	lbl2.text = "THis is second lbl.";
+	lbl2.widget.acceptFocusByTab = 1;
+	guiWidgets_SetSize((guiWidgetBase_t*)&lbl2, 15,90, 45,45);
 }
+
+void prv_wnd2Init()
+{
+	guiWidgetPanel_Init(&panel2, 0);
+	guiCore_AllocateWidgetCollection((guiContainer_t*)&panel2, 3);
+
+
+	guiWidgetText_Init(&lbl4, (guiWidgetBase_t*)&panel2);
+	lbl4.font = &font_h12;
+	lbl4.hasFrame = 0;
+	lbl4.redrawText = 0;
+	lbl4.text = "This is lbl.";
+	lbl4.textAlignment = ALIGN_CENTER;
+	lbl4.widget.acceptFocusByTab = 1;
+	guiWidgets_SetSize((guiWidgetBase_t*)&lbl4, 55,55, 45,15);
+
+	guiWidgetText_Init(&lbl5, (guiWidgetBase_t*)&panel2);
+	lbl5.font = &font_h12;
+	lbl5.text = "This is another text lable. So";
+	lbl5.widget.acceptFocusByTab = 1;
+	guiWidgets_SetSize((guiWidgetBase_t*)&lbl5, 15,70, 45,15);
+
+	guiWidgetText_Init(&lbl6, (guiWidgetBase_t*)&panel2);
+	lbl6.font = &font_h10;
+	lbl6.text = "THis is second lbl.";
+	lbl6.widget.acceptFocusByTab = 1;
+	guiWidgets_SetSize((guiWidgetBase_t*)&lbl6, 15,120, 45,15);
+}
+
+
 
 
 // REAL CODE===================================================================================
@@ -288,7 +331,9 @@ void guiCore_Error(uint8_t errCode)
  */
 int guiCore_SetActiveWindow(guiContainer_t *_activeWindow)
 {
+	if (activeWindow == _activeWindow)	return (-1);
 	activeWindow = _activeWindow;
+	guiCore_DrawWindow();
 	return guiCore_FocusFirst();
 }
 
@@ -390,4 +435,14 @@ void guiCore_AcceptFocus(guiWidgetBase_t *wgt)
 	}
 	guiMsg_AddMessageToQueue(wgt, &guiEvent_FOCUS);
 	focusedWidget = wgt;
+}
+
+void guiCore_DrawWindow()
+{
+	guiMsg_AddMessageToQueue( (guiWidgetBase_t*)activeWindow, &guiEvent_DRAW );
+	int i;
+	for (i = 0; i < activeWindow->children.count; ++i) {
+		if (activeWindow->children.elements[i] == 0)	continue;
+		guiMsg_AddMessageToQueue( (guiWidgetBase_t*)activeWindow->children.elements[i], &guiEvent_DRAW );
+	}
 }

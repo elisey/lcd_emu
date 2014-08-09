@@ -2,15 +2,15 @@
 #define GUICORE_H
 
 #include "guiWidgets.h"
-
+#include "guiWidgetPanel.h"
 #define emGUI_ERROR_OUT_OF_HEAP                 0x01
 #define emGUI_ERROR_OUT_OF_PREALLOCATED_MEMORY  0x02
 #define emGUI_ERROR_NULL_REF                    0x03
 
-void guiCore_Init();
-//void guiCore_DrawWidget(guiWidgetBase_t *widget);
-//void guiCore_DrawWidgetText(guiWidgetText_t *widget);
+extern guiWidgetPanel_t panel, panel2;
 
+
+void guiCore_Init();
 
 void *guiCore_malloc(size_t wantedSize);
 void *guiCore_calloc(size_t wantedSize);
@@ -29,7 +29,10 @@ int guiCore_SetActiveWindow(guiContainer_t* _activeWindow);
 void guiCore_GetActiveWindow(guiContainer_t** ptrActiveWnd);
 int guiCore_FocusFirst();
 int guiCore_FocusNext(int direction);
+int guiCore_GetNextFocusableWgtIdx();
 void guiCore_AcceptFocus(guiWidgetBase_t *wgt);
+
+void guiCore_DrawWindow();
 
 void guiCore_Error(uint8_t errCode);
 
