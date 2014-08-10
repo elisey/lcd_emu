@@ -41,9 +41,10 @@ uint8_t guiWidgetPanel_ProcessEvent(guiWidgetBase_t *wgt, guiEvent_t *event)
         //guiCore_FocusPushToChild((guiContainer_t*)wgt);
         break;
     default:
+		return guiCore_CallEventHandler(wgt, event);
         break;
     }
-    return guiCore_CallEventHandler(wgt, event);
+
     //return GUI_EVENT_ACCEPTED;
 }
 

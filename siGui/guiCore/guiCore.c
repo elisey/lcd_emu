@@ -5,6 +5,8 @@
 
 #include "guiMsg.h"
 #include "guiConfig.h"
+
+#include "guiKey.h"
 #include <string.h>
 
 
@@ -40,6 +42,8 @@ guiWidgetText_t lbl4;
 guiWidgetText_t lbl5;
 guiWidgetText_t lbl6;
 
+uint8_t panel_keyHandler(void *sender, guiEvent_t *event);
+
 void prv_graphPrimitivesTest()
 {
 
@@ -69,6 +73,8 @@ void prv_graphPrimitivesTest()
     lbl2.text = "THis is second lbl.";
     lbl2.widget.acceptFocusByTab = 1;
     guiWidgets_SetSize((guiWidgetBase_t*)&lbl2, 15,70, 45,45);
+
+
 
 
     guiMsg_AddMessageToQueue((guiWidgetBase_t*)(&panel), &guiEvent_DRAW);
@@ -109,6 +115,9 @@ void prv_wnd1Init()
 	lbl2.text = "THis is second lbl.";
 	lbl2.widget.acceptFocusByTab = 1;
 	guiWidgets_SetSize((guiWidgetBase_t*)&lbl2, 15,90, 45,45);
+
+	guiCore_AllocateHandlers((guiWidgetBase_t*)(&panel), 1);
+	guiCore_AddHandler((guiWidgetBase_t*)(&panel),GUI_EVENT_KEY, panel_keyHandler);
 }
 
 void prv_wnd2Init()
@@ -137,10 +146,45 @@ void prv_wnd2Init()
 	lbl6.text = "THis is second lbl.";
 	lbl6.widget.acceptFocusByTab = 1;
 	guiWidgets_SetSize((guiWidgetBase_t*)&lbl6, 15,120, 45,15);
+	guiCore_AllocateHandlers((guiWidgetBase_t*)(&panel2), 1);
+	guiCore_AddHandler((guiWidgetBase_t*)(&panel2),GUI_EVENT_KEY, panel_keyHandler);
 }
 
 
+uint8_t panel_keyHandler(void *sender, guiEvent_t *event)
+{
+	int dir;
+	int result;
+	switch (event->hparam) {
+	case guiKey_Enter:
 
+		break;
+	case guiKey_Esc:
+		guiCore_FocusFirst();
+		break;
+	case guiKey_Left:
+	case guiKey_Right:
+		if (event->hparam == guiKey_Left)	{
+			dir = -1;
+		}
+		else if (event->hparam == guiKey_Right)	{
+			dir = 1;
+		}
+
+		result = guiCore_FocusNext(dir);
+		if (result == -1)	{
+			if (sender == (void*)&panel)	{
+				guiCore_SetActiveWindow((guiContainer_t*)&panel2);
+			}
+			else if (sender == (void*)&panel2)	{
+				guiCore_SetActiveWindow((guiContainer_t*)&panel);
+			}
+		}
+		break;
+	default:
+		break;
+	}
+}
 
 // REAL CODE===================================================================================
 
@@ -315,6 +359,8 @@ void guiCore_AllocateWidgetCollection(guiContainer_t *container, uint16_t count)
 
 void guiCore_Error(uint8_t errCode)
 {
+	volatile uint8_t dummy;
+	dummy = errCode;
     // One may trace call stack and thus find source of the error
     while(1);
 }

@@ -34,6 +34,7 @@ void guiCore_AcceptFocus(guiWidgetBase_t *wgt);
 
 void guiCore_DrawWindow();
 
+
 void guiCore_Error(uint8_t errCode);
 
 #endif // GUICORE_H

@@ -9,6 +9,7 @@
 #define GUI_EVENT_SHOW          0x07
 #define GUI_EVENT_UNFOCUS       0x08
 #define GUI_EVENT_FOCUS         0x09
+#define GUI_EVENT_KEY           0x0A
 //#define GUI_EVENT_TOUCH         0x0A
 //#define GUI_EVENT_KEY           0x0B
 //#define GUI_EVENT_TIMER         0x0D
